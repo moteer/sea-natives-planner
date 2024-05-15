@@ -59,15 +59,22 @@ public class SeleniumScraper {
         return bookingParser.parseBookings(bookingsCsv);
     }
 
-    public List<Guest> scrapeParticipantsForBooking(String booking) {
+    public List<Guest> scrapeGuestsFor(List<Booking> bookings) {
+        List<Guest> guests = new ArrayList<>();
+        bookings.forEach(booking -> guests.addAll(scrapeParticipantsForBooking(booking)));
+        return guests;
+    }
+
+    public List<Guest> scrapeParticipantsForBooking(Booking booking) {
         List<Guest> guests = new ArrayList<>();
         setUp();
-        driver.get(format("https://app.bookinglayer.io/orders/%s", booking));
+        driver.get(format("https://app.bookinglayer.io/orders/%s", booking.getId()));
         loginIfNeeded();
         String participants = waitForAndGetWebElement(By.id("OrderPaxLabel"), 10).getText();
         driver.findElements(By.cssSelector(".guestElement"))
                 .forEach(guestElement -> {
                     Guest guest = new Guest();
+                    guest.setBooking(booking);
                     guests.add(guest);
                     String guestName = guestElement.findElement(By.cssSelector(".guestElementName")).getText();
                     System.out.println(guestName);

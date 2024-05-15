@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.time.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Component
 public class AppStartUp implements CommandLineRunner {
@@ -22,35 +24,44 @@ public class AppStartUp implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         List<Booking> bookings = seleniumScraper.scrapeAllBookings();
-        // System.out.println(bookings);
 
-        List<Guest> guests = new ArrayList<>();
+        Instant startDate = getDate(2024, Month.JUNE, 1);
+        Instant endDate = getDate(2024, Month.JULY, 30);
 
-
-
-        Date startDate = getDate(2024, Month.JUNE, 1);
-        // todo end of day
-        Date endDate = getDate(2024, Month.JUNE, 30);
-
-        // todo make this a service
-        bookings.stream()
-                .filter(booking -> booking.getCheckInAt().after(startDate)
-                        && booking.getCheckOutAt().before(endDate))
-                .forEach(booking ->
-                        System.out.printf("%s am %s bis %s%n", booking.getBookerFirstName(), booking.getCheckInAt(), booking.getCheckOutAt()));
-
-//        guests.addAll(seleniumScraper.scrapeParticipantsForBooking("7c2d1392-22fe-442e-a121-28d19d185e65"));
-//        guests.addAll(seleniumScraper.scrapeParticipantsForBooking("d8dd0dc2-f614-4d65-b6bd-1d3f87e3d9e6"));
-
+        List<Guest> guests = scrapeGuestsFor(bookings, startDate, endDate);
+        guests.forEach(System.out::println);
 
         System.out.println("shut down");
         System.exit(0);
     }
 
-    private static Date getDate(int year, Month month, int day) {
+    private List<Guest> scrapeGuestsFor(List<Booking> bookings, Instant startDate, Instant endDate) {
+        Instant exclusiveEndDate = endDate.plus(Duration.ofDays(1));
+        List<Booking> bookingsForDateRange = bookings.stream()
+                .filter(booking -> booking.getCheckInAt().after(Date.from(startDate))
+                        && booking.getCheckOutAt().before(Date.from(exclusiveEndDate)))
+                .collect(Collectors.toList());
+        printBookings(bookingsForDateRange);
+        return seleniumScraper.scrapeGuestsFor(bookingsForDateRange);
+
+    }
+
+    private void printBookings(List<Booking> bookingsForDateRange) {
+        SimpleDateFormat deFormatter = new SimpleDateFormat("EEEE, dd.MM.yyyy", Locale.GERMANY);
+        System.out.printf("%-20s %-30s %-30s%n", "Name", "Check-In", "Check-Out");
+        bookingsForDateRange
+                .forEach(booking -> {
+                            System.out.printf("%-20s %-30s %-30s%n", booking.getBookerFirstName(),
+                                    deFormatter.format(booking.getCheckInAt()),
+                                    deFormatter.format(booking.getCheckOutAt()));
+                        }
+                );
+    }
+
+    private static Instant getDate(int year, Month month, int day) {
         ZonedDateTime zonedDateTime = LocalDate.of(year, month, day)
                 .atStartOfDay(ZoneId.systemDefault());
-        return Date.from(zonedDateTime.toInstant());
+        return zonedDateTime.toInstant();
     }
 }
 
