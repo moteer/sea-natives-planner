@@ -10,5 +10,5 @@ import lombok.ToString;
 public final class Guest {
     private String name;
     private int numberOfSurfClassesBooked;
-    private Booking booking;
+    private CsvBooking csvBooking;
 }

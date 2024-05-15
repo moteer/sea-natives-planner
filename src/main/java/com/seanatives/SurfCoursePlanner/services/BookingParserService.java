@@ -2,7 +2,7 @@ package com.seanatives.SurfCoursePlanner.services;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.seanatives.SurfCoursePlanner.domain.Booking;
+import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import org.springframework.stereotype.Service;
 
 import java.io.Reader;
@@ -11,12 +11,12 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
-public class BookingParser {
+public class BookingParserService {
 
-    public static List<Booking> parseBookings(Path csvPath) throws Exception {
+    public static List<CsvBooking> parseBookings(Path csvPath) throws Exception {
         try (Reader reader = Files. newBufferedReader(csvPath)) {
-            CsvToBean<Booking> csvToBean = new CsvToBeanBuilder<Booking>(reader)
-                    .withType(Booking.class)
+            CsvToBean<CsvBooking> csvToBean = new CsvToBeanBuilder<CsvBooking>(reader)
+                    .withType(CsvBooking.class)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();
 

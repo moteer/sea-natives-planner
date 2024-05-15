@@ -1,6 +1,6 @@
 package com.seanatives.SurfCoursePlanner.controller;
 
-import com.seanatives.SurfCoursePlanner.scraper.SeleniumScraper;
+import com.seanatives.SurfCoursePlanner.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloWorld {
 
     @Autowired
-    private SeleniumScraper seleniumScraper;
+    private BookingRepository bookingRepository;
 
-    @GetMapping("/hello")
-    public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) throws Exception {
+    @GetMapping("/bookings")
+    public String bookings(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) throws Exception {
         model.addAttribute("name", name);
-        //return new SeleniumScraper().scrapeAllBookings();
-        return seleniumScraper.scrapeAllBookings().toString();
+
+        return bookingRepository.findAll().toString();
     }
 }

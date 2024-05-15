@@ -6,7 +6,7 @@ import java.io.File;
 import java.nio.file.*;
 
 @Service
-public class CSVFileWatcher {
+public class CSVFileWatcherService {
 
     public Path waitForFileToBeWritten(String directoryPath, String fileNamePrefix) {
         File latestFile = null;
