@@ -5,9 +5,12 @@ import com.opencsv.bean.CsvDate;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class Booking {
+
+    List<Guest> guests;
 
     @CsvBindByName(column = "id")
     private String id;
