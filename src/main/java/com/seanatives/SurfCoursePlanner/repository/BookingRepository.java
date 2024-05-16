@@ -1,4 +1,4 @@
-package com.seanatives.SurfCoursePlanner;
+package com.seanatives.SurfCoursePlanner.repository;
 
 import com.seanatives.SurfCoursePlanner.domain.Booking;
 import org.springframework.data.repository.CrudRepository;

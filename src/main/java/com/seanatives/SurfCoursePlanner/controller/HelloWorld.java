@@ -1,6 +1,6 @@
 package com.seanatives.SurfCoursePlanner.controller;
 
-import com.seanatives.SurfCoursePlanner.BookingRepository;
+import com.seanatives.SurfCoursePlanner.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

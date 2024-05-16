@@ -1,14 +1,19 @@
 package com.seanatives.SurfCoursePlanner.domain;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
-public final class Guest {
+@Data
+@Entity
+@Table(name = "guest")
+public  class Guest {
+    @Id
+    private Long id;
+
     private String name;
     private int numberOfSurfClassesBooked;
-    private CsvBooking csvBooking;
+    // Many-to-One Beziehung zu Booking
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 }
