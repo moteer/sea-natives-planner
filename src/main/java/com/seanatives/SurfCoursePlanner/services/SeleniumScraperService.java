@@ -8,6 +8,7 @@ import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import com.seanatives.SurfCoursePlanner.domain.Guest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -78,31 +79,42 @@ public class SeleniumScraperService {
                     guest.setBooking(booking);
                     guests.add(guest);
                     String guestName = guestElement.findElement(By.cssSelector(".guestElementName")).getText();
-                    System.out.println(guestName);
+                    String guestAge = findElementIfExists(guestElement, By.cssSelector(".ml-3.text-muted"));
                     guest.setName(guestName);
+                    guest.setAge(guestAge);
                     // Surf lesson adults
                     guestElement.findElements(By.cssSelector("[data-product-id='c56a8cc5-1ec5-4011-a64f-e102234acf78']"))
                             .forEach(td -> {
                                 String text = td.getText();
-                                System.out.println(text);
                                 guest.setNumberOfSurfClassesBooked(parseNumberOfSurfCourses(text));
                             });
 
                     // Surf course adults
                     guestElement.findElements(By.cssSelector("[data-product-id='9beb5277-b0a6-4107-b56f-c33b74c43505']"))
                             .forEach(td -> {
-                                System.out.println(td.getText());
                                 guest.setNumberOfSurfClassesBooked(5);
                             });
                     // Surf course kids
                     guestElement.findElements(By.cssSelector("[data-product-id='dffa5b6e-9e78-40c6-a8ca-300f6cc1e437']"))
                             .forEach(td -> {
-                                System.out.println(td.getText());
                                 guest.setNumberOfSurfClassesBooked(5);
                             });
 
+                    System.out.println(guest);
+
                 });
         return guests;
+    }
+
+    private String findElementIfExists(WebElement webElement, By locator) {
+        String text = "N/A";
+        try {
+            WebElement element = webElement.findElement(locator);
+            text = element.getText();
+        } catch (NoSuchElementException noSuchElementException) {
+            System.out.println(format("Could not find %s", locator));
+        }
+        return text;
     }
 
     private int parseNumberOfSurfCourses(String text) {

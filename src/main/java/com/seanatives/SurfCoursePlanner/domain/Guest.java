@@ -16,4 +16,6 @@ public  class Guest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id")
     private Booking booking;
+    private String age;
+
 }
