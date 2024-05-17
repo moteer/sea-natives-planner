@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
-public class DataLoadingService {
+public class DataLoaderService {
     @Autowired
     private SeleniumScraperService seleniumScraperService;
     @Autowired
