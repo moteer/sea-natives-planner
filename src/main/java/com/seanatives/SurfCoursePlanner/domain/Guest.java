@@ -18,5 +18,7 @@ public  class Guest {
     @JoinColumn(name = "booking_id")
     private Booking booking;
     private String age;
-
+    @Lob
+    @Column(name = "booking_details", columnDefinition = "TEXT")
+    private String bookingDetails;
 }

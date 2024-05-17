@@ -80,10 +80,16 @@ public class SeleniumScraperService {
                     guests.add(guest);
                     String guestName = guestElement.findElement(By.cssSelector(".guestElementName")).getText();
                     String guestAge = findElementIfExists(guestElement, By.cssSelector(".ml-3.text-muted"));
-                    String bookingLines = findElementIfExists(guestElement, By.cssSelector("BookingLine"));
+
+                    // Tent #10
+                    //String bookingLines = findElementIfExists(guestElement, By.cssSelector("[data-product-type='accommodation'] td:nth-child(3) > div > div:nth-child(3)"));
+
                     guest.setName(guestName);
                     guest.setAge(guestAge);
                     // Surf lesson adults
+                    String bookingDetails = findElementIfExists(guestElement, By.cssSelector(".guestItineraryTable"));
+                    guest.setBookingDetails(bookingDetails);
+
                     guestElement.findElements(By.cssSelector("[data-product-id='c56a8cc5-1ec5-4011-a64f-e102234acf78']"))
                             .forEach(td -> {
                                 String text = td.getText();
