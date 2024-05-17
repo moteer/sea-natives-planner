@@ -4,6 +4,7 @@ import com.seanatives.SurfCoursePlanner.domain.Booking;
 import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import com.seanatives.SurfCoursePlanner.domain.Guest;
 import com.seanatives.SurfCoursePlanner.repository.BookingRepository;
+import com.seanatives.SurfCoursePlanner.repository.GuestRepository;
 import com.seanatives.SurfCoursePlanner.services.BookingCopyService;
 import com.seanatives.SurfCoursePlanner.services.SeleniumScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class AppStartUp implements CommandLineRunner {
     private BookingCopyService bookingCopyService;
     @Autowired
     private BookingRepository bookingRepository;
+    @Autowired
+    private GuestRepository guestRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -42,13 +45,10 @@ public class AppStartUp implements CommandLineRunner {
         List<Guest> guests = scrapeGuestsFor(bookings, startDate, endDate);
         persistGuests(guests);
         guests.forEach(System.out::println);
-
-        //System.out.println("shut down");
-        //System.exit(0);
     }
 
     private void persistGuests(List<Guest> guests) {
-
+        guestRepository.saveAll(guests);
     }
 
     private List<Booking> persistBookings(List<CsvBooking> csvBookings) {

@@ -8,6 +8,7 @@ import lombok.Data;
 @Table(name = "guest")
 public  class Guest {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String name;

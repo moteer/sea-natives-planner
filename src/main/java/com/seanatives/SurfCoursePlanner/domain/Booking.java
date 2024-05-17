@@ -3,6 +3,7 @@ package com.seanatives.SurfCoursePlanner.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,22 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Guest> guests;
+
+    public void addGuest(Guest guest) {
+        createGuestListIfNeeded();
+        this.guests.add(guest);
+    }
+
+    public void addGuests(List<Guest> guests) {
+        createGuestListIfNeeded();
+        this.guests.addAll(guests);
+    }
+
+    private void createGuestListIfNeeded() {
+        if (this.guests == null)
+            this.guests = new ArrayList<>();
+    }
+
 
     private String bookingId;
 

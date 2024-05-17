@@ -80,6 +80,7 @@ public class SeleniumScraperService {
                     guests.add(guest);
                     String guestName = guestElement.findElement(By.cssSelector(".guestElementName")).getText();
                     String guestAge = findElementIfExists(guestElement, By.cssSelector(".ml-3.text-muted"));
+                    String bookingLines = findElementIfExists(guestElement, By.cssSelector("BookingLine"));
                     guest.setName(guestName);
                     guest.setAge(guestAge);
                     // Surf lesson adults
