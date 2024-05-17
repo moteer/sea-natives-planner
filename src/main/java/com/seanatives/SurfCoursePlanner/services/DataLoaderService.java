@@ -29,12 +29,16 @@ public class DataLoaderService {
     @Autowired
     private GuestService guestService;
 
-    public void loadData(Date start, Date end, SimpMessagingTemplate messagingTemplate) throws Exception {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+
+    public void loadData(Date start, Date end) throws Exception {
         messagingTemplate.convertAndSend("/topic/logs", "Scrape all bookings");
         List<CsvBooking> csvBookings = seleniumScraperService.scrapeAllBookings();
         List<Booking> bookings = persistBookings(csvBookings);
         messagingTemplate.convertAndSend("/topic/logs", format("%d bookings will be saved", bookings.size()));
-        List<Guest> guests = scrapeGuestsFor(bookings, start, end, messagingTemplate);
+        List<Guest> guests = scrapeGuestsFor(bookings, start, end);
         persistGuests(guests);
         guests.forEach(System.out::println);
     }
@@ -48,13 +52,13 @@ public class DataLoaderService {
         return bookingService.saveOrUpdateBookings(bookings);
     }
 
-    private List<Guest> scrapeGuestsFor(List<Booking> bookings, Date startDate, Date endDate, SimpMessagingTemplate messagingTemplate) {
+    private List<Guest> scrapeGuestsFor(List<Booking> bookings, Date startDate, Date endDate) {
 
         List<Booking> bookingsForDateRange = bookings.stream()
                 .filter(booking -> isInTimeRange(startDate, endDate, booking))
                 .collect(Collectors.toList());
         printBookings(bookingsForDateRange);
-        return seleniumScraperService.scrapeGuestsFor(bookingsForDateRange, messagingTemplate);
+        return seleniumScraperService.scrapeGuestsFor(bookingsForDateRange);
 
     }
 

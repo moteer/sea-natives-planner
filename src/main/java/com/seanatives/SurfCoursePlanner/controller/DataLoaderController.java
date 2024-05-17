@@ -21,9 +21,6 @@ public class DataLoaderController {
     @Autowired
     private DataLoaderService dataLoaderService;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
     @PostMapping("/start")
     public String startDataLoader(@RequestParam("startDate") String startDate,
                                   @RequestParam("endDate") String endDate) throws Exception{
@@ -33,7 +30,7 @@ public class DataLoaderController {
         Date start = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date end = Date.from(endLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        dataLoaderService.loadData(start, end, messagingTemplate);
+        dataLoaderService.loadData(start, end);
         return "Data loader started";
     }
 }
