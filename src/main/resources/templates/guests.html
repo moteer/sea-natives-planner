@@ -6,16 +6,60 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #282c34;
+            color: #61dafb;
+            font-family: monospace;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #61dafb;
+        }
+        .form-control, .btn {
+            background-color: #1c1e22;
+            color: #61dafb;
+            border: 1px solid #61dafb;
+        }
+        .form-control::placeholder {
+            color: #61dafb;
+        }
+        .form-control:focus {
+            border-color: #61dafb;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: #282c34;
+            border-color: #61dafb;
+        }
+        .btn-primary:hover {
+            background-color: #61dafb;
+            color: #282c34;
+        }
+        .sticky-top {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background-color: #282c34;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #595959;
+            color: white;
         }
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #61dafb;
             padding: 8px;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #4b4b4b;
             text-align: left;
         }
     </style>
@@ -23,14 +67,14 @@
 <body>
 <div class="container">
     <h1>Gäste</h1>
-    <div class="row">
+    <div class="row sticky-top">
         <div class="col-md-5">
             <label for="startDate">Start Date:</label>
-            <input type="text" id="startDate" class="form-control">
+            <input type="text" id="startDate" class="form-control" placeholder="YYYY-MM-DD">
         </div>
         <div class="col-md-5">
             <label for="endDate">End Date:</label>
-            <input type="text" id="endDate" class="form-control">
+            <input type="text" id="endDate" class="form-control" placeholder="YYYY-MM-DD">
         </div>
         <div class="col-md-2">
             <label>&nbsp;</label>
@@ -38,7 +82,7 @@
         </div>
     </div>
     <br>
-    <table class="table table-bordered">
+    <table class="table-bordered table">
         <thead>
         <tr>
             <th>ID</th>
@@ -47,18 +91,16 @@
             <th>Booking ID</th>
             <th>Check-in</th>
             <th>Check-out</th>
-            <th>Details</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="guest : ${guests}">
-            <td th:text="${guest.id}">1</td>
-            <td th:text="${guest.name}">John Doe</td>
-            <td th:text="${guest.numberOfSurfClassesBooked}">5</td>
-            <td th:text="${guest.booking.bookingId}">Booking123</td>
-            <td th:text="${#dates.format(guest.booking.checkInAt, 'yyyy-MM-dd HH:mm:ss')}">2023-01-01 14:00:00</td>
-            <td th:text="${#dates.format(guest.booking.checkOutAt, 'yyyy-MM-dd HH:mm:ss')}">2023-01-07 10:00:00</td>
-            <td th:text="${guest.bookingDetails}">booking Details</td>
+            <td th:text="${guest.id}"></td>
+            <td th:text="${guest.name}"></td>
+            <td th:text="${guest.numberOfSurfClassesBooked}"></td>
+            <td th:text="${guest.booking.bookingId}"></td>
+            <td th:text="${#dates.format(guest.booking.checkInAt, 'yyyy-MM-dd')}"></td>
+            <td th:text="${#dates.format(guest.booking.checkOutAt, 'yyyy-MM-dd')}"></td>
         </tr>
         </tbody>
     </table>
