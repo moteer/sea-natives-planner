@@ -14,6 +14,7 @@ public  class Guest {
     private String name;
     private int numberOfSurfClassesBooked;
     // Many-to-One Beziehung zu Booking
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id")
     private Booking booking;

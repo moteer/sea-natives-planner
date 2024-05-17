@@ -3,9 +3,8 @@ package com.seanatives.SurfCoursePlanner.services;
 import com.seanatives.SurfCoursePlanner.domain.Booking;
 import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import com.seanatives.SurfCoursePlanner.domain.Guest;
-import com.seanatives.SurfCoursePlanner.repository.BookingRepository;
-import com.seanatives.SurfCoursePlanner.repository.GuestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -17,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Service
 public class DataLoaderService {
     @Autowired
@@ -24,39 +25,36 @@ public class DataLoaderService {
     @Autowired
     private BookingCopyService bookingCopyService;
     @Autowired
-    private BookingRepository bookingRepository;
+    private BookingService bookingService;
     @Autowired
-    private GuestRepository guestRepository;
+    private GuestService guestService;
 
-    public void loadData() throws Exception {
+    public void loadData(Date start, Date end, SimpMessagingTemplate messagingTemplate) throws Exception {
+        messagingTemplate.convertAndSend("/topic/logs", "Scrape all bookings");
         List<CsvBooking> csvBookings = seleniumScraperService.scrapeAllBookings();
         List<Booking> bookings = persistBookings(csvBookings);
-
-        Date startDate = createDate(2024, Month.MAY, 1);
-        Date endDate = createDate(2024, Month.JUNE, 1);
-
-        List<Guest> guests = scrapeGuestsFor(bookings, startDate, endDate);
+        messagingTemplate.convertAndSend("/topic/logs", format("%d bookings will be saved", bookings.size()));
+        List<Guest> guests = scrapeGuestsFor(bookings, start, end, messagingTemplate);
         persistGuests(guests);
         guests.forEach(System.out::println);
     }
 
     private void persistGuests(List<Guest> guests) {
-        guestRepository.saveAll(guests);
+        guestService.saveOrUpdateGuest(guests);
     }
 
     private List<Booking> persistBookings(List<CsvBooking> csvBookings) {
         List<Booking> bookings = bookingCopyService.convertCsvsToEntities(csvBookings);
-        bookingRepository.saveAll(bookings);
-        return bookings;
+        return bookingService.saveOrUpdateBookings(bookings);
     }
 
-    private List<Guest> scrapeGuestsFor(List<Booking> bookings, Date startDate, Date endDate) {
+    private List<Guest> scrapeGuestsFor(List<Booking> bookings, Date startDate, Date endDate, SimpMessagingTemplate messagingTemplate) {
 
         List<Booking> bookingsForDateRange = bookings.stream()
                 .filter(booking -> isInTimeRange(startDate, endDate, booking))
                 .collect(Collectors.toList());
         printBookings(bookingsForDateRange);
-        return seleniumScraperService.scrapeGuestsFor(bookingsForDateRange);
+        return seleniumScraperService.scrapeGuestsFor(bookingsForDateRange, messagingTemplate);
 
     }
 

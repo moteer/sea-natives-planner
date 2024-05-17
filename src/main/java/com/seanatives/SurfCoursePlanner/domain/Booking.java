@@ -34,9 +34,7 @@ public class Booking {
             this.guests = new ArrayList<>();
     }
 
-
     private String bookingId;
-
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 

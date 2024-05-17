@@ -17,6 +17,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -59,15 +60,18 @@ public class SeleniumScraperService {
         return bookingParserService.parseBookings(bookingsCsv);
     }
 
-    public List<Guest> scrapeGuestsFor(List<Booking> bookings) {
+    public List<Guest> scrapeGuestsFor(List<Booking> bookings, SimpMessagingTemplate messagingTemplate) {
         setUp();
         List<Guest> guests = new ArrayList<>();
-        bookings.forEach(booking -> guests.addAll(scrapeParticipantsForBooking(booking)));
+        bookings.forEach(booking -> guests.addAll(scrapeParticipantsForBooking(booking, messagingTemplate)));
         driver.close();
+        messagingTemplate.convertAndSend("/topic/logs", format("scraping done"));
         return guests;
     }
 
-    private List<Guest> scrapeParticipantsForBooking(Booking booking) {
+    private List<Guest> scrapeParticipantsForBooking(Booking booking, SimpMessagingTemplate messagingTemplate) {
+        messagingTemplate.convertAndSend("/topic/logs",
+                format("Scrape %s %s %s", booking.getBookerFirstName(), booking.getBookerLastName(), booking.getBookingId()));
         List<Guest> guests = new ArrayList<>();
         System.out.println(format("scrape booking: %s for booker %s", booking.getBookingId(), booking.getBookerFirstName()));
         driver.get(format("https://app.bookinglayer.io/orders/%s", booking.getBookingId()));
@@ -110,6 +114,8 @@ public class SeleniumScraperService {
                     System.out.println(guest);
 
                 });
+        messagingTemplate.convertAndSend("/topic/logs",
+                format("Found %d guests for that booking", guests.size()));
         return guests;
     }
 
