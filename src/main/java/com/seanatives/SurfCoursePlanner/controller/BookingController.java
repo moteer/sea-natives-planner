@@ -54,4 +54,18 @@ public class BookingController {
         model.addAttribute("guests", guests);
         return "guests";
     }
+
+    @GetMapping("/yoga")
+    public String getGuestsWithYogaBooked(Model model,
+                            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        List<Guest> guests;
+        if (startDate != null && endDate != null) {
+            guests = guestService.findGuestsInRangeWithYoga(startDate, endDate);
+        } else {
+            guests = guestService.findAllGuestsWithYoga();
+        }
+        model.addAttribute("guests", guests);
+        return "yoga";
+    }
 }

@@ -55,6 +55,8 @@ public class SeleniumScraperService {
     private CSVFileWatcherService CSVFileWatcherService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private GuestParserService guestParserService;
 
     public List<CsvBooking> scrapeAllBookings() throws Exception {
         setUp();
@@ -96,6 +98,7 @@ public class SeleniumScraperService {
                     // Surf lesson adults
                     String bookingDetails = findElementIfExists(guestElement, By.cssSelector(".guestItineraryTable"));
                     guest.setBookingDetails(bookingDetails);
+                    guestParserService.parseGuest(guest);
 
                     guestElement.findElements(By.cssSelector("[data-product-id='c56a8cc5-1ec5-4011-a64f-e102234acf78']"))
                             .forEach(td -> {

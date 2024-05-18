@@ -19,6 +19,8 @@ public class GuestService {
 
     @Autowired
     private GuestRepository guestRepository;
+    @Autowired
+    private GuestParserService guestParserService;
 
     public List<Guest> findAll() {
         Iterable<Guest> iterable = guestRepository.findAll();
@@ -69,5 +71,17 @@ public class GuestService {
             // Neuer Gast
             return guestRepository.save(guest);
         }
+    }
+
+    public List<Guest> findGuestsInRangeWithYoga(LocalDate startDate, LocalDate endDate) {
+        List<Guest> guestsInRange = findGuestsInRange(startDate, endDate);
+        return guestsInRange.stream().filter(guest -> guestParserService.hasYogaBooked(guest))
+                .collect(Collectors.toList());
+    }
+
+    public List<Guest> findAllGuestsWithYoga() {
+        List<Guest> guestsInRange = findAll();
+        return guestsInRange.stream().filter(guest -> guestParserService.hasYogaBooked(guest))
+                .collect(Collectors.toList());
     }
 }

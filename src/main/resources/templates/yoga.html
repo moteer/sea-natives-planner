@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Yogateilnehmer</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #282c34;
+            color: #61dafb;
+            font-family: monospace;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #61dafb;
+        }
+        .form-control, .btn {
+            background-color: #1c1e22;
+            color: #61dafb;
+            border: 1px solid #61dafb;
+        }
+        .form-control::placeholder {
+            color: #61dafb;
+        }
+        .form-control:focus {
+            border-color: #61dafb;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: #282c34;
+            border-color: #61dafb;
+        }
+        .btn-primary:hover {
+            background-color: #61dafb;
+            color: #282c34;
+        }
+        .sticky-top {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background-color: #282c34;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #595959;
+            color: white;
+        }
+        th, td {
+            border: 1px solid #61dafb;
+            padding: 8px;
+        }
+        th {
+            background-color: #4b4b4b;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Gäste</h1>
+    <div class="row sticky-top">
+        <div class="col-md-5">
+            <label for="startDate">Start Date:</label>
+            <input type="text" id="startDate" class="form-control" placeholder="YYYY-MM-DD">
+        </div>
+        <div class="col-md-5">
+            <label for="endDate">End Date:</label>
+            <input type="text" id="endDate" class="form-control" placeholder="YYYY-MM-DD">
+        </div>
+        <div class="col-md-2">
+            <label>&nbsp;</label>
+            <button id="filterButton" class="btn btn-primary btn-block">Filter</button>
+        </div>
+    </div>
+    <br>
+    <table class="table-bordered table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Booking ID</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Booked Yoga hours</th>
+            <th>Booking Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="guest : ${guests}">
+            <td th:text="${guest.id}"></td>
+            <td th:text="${guest.name}"></td>
+            <td th:text="${guest.booking.bookingId}"></td>
+            <td th:text="${#dates.format(guest.booking.checkInAt, 'yyyy-MM-dd')}"></td>
+            <td th:text="${#dates.format(guest.booking.checkOutAt, 'yyyy-MM-dd')}"></td>
+            <td th:text="${guest.bookedYogaHours}"></td>
+            <td th:text="${guest.bookingDetails}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#startDate, #endDate').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+
+        $('#filterButton').click(function() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            window.location.href = '/yoga?startDate=' + startDate + '&endDate=' + endDate;
+        });
+    });
+</script>
+</body>
+</html>

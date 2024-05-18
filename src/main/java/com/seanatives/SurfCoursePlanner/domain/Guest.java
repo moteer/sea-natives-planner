@@ -22,4 +22,6 @@ public  class Guest {
     @Lob
     @Column(name = "booking_details", columnDefinition = "TEXT")
     private String bookingDetails;
+    private Integer bookedYogaHours;
+
 }

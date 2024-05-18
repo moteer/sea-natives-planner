@@ -32,7 +32,6 @@ public class DataLoaderService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-
     public void loadData(Date start, Date end) throws Exception {
         messagingTemplate.convertAndSend("/topic/logs", "Scrape all bookings");
         List<CsvBooking> csvBookings = seleniumScraperService.scrapeAllBookings();
