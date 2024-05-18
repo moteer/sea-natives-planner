@@ -2,6 +2,7 @@ package com.seanatives.SurfCoursePlanner.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,8 +11,8 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "booking")
+@ToString(exclude = "guests")
 public class Booking {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
