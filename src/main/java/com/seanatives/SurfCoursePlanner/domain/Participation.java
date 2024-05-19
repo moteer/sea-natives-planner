@@ -13,6 +13,8 @@ public class Participation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String frontendId;
+
     @ManyToOne
     @JoinColumn(name = "guest_id")
     private Guest guest;

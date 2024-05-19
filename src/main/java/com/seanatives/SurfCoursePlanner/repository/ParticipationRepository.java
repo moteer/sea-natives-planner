@@ -15,4 +15,9 @@ public interface ParticipationRepository extends CrudRepository<Participation, L
     Optional<Participation> findByGuestIdAndCourseTypeAndDate(Long guestId, String courseType, Date date);
 
     List<Participation> findByGuestId(Long guestId);
+    List<Participation> findByFrontendId(String frontendId);
+
+    List<Participation> findByFrontendIdIn(List<String> frontendIds);
+
+    List<Participation> findByFrontendIdNotIn(List<String> frontendIds);
 }
