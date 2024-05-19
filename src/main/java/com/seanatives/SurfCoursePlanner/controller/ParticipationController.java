@@ -61,4 +61,6 @@ public class ParticipationController {
 
         return "weeklyAttendance";
     }
+
+
 }

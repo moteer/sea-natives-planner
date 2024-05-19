@@ -3,6 +3,8 @@ package com.seanatives.SurfCoursePlanner.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "guest")
@@ -23,5 +25,8 @@ public  class Guest {
     @Column(name = "booking_details", columnDefinition = "TEXT")
     private String bookingDetails;
     private Integer bookedYogaHours;
+
+    @OneToMany(mappedBy = "guest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Participation> participations;
 
 }

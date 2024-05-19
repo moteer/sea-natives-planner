@@ -10,6 +10,9 @@
       background-color: #f0ad4e;
       color: orangered;
     }
+    .guest-on-site {
+      background-color: #c5f5c0;
+    }
     .table-container {
       overflow-x: auto;
       position: relative;
@@ -56,7 +59,8 @@
       <thead>
       <tr>
         <th class="fixed-column table-fixed-header">Guest</th>
-        <th th:each="date, iterStat : ${weekDates}" th:classappend="${#dates.format(date, 'yyyy-MM-dd') == #dates.format(today, 'yyyy-MM-dd') ? 'current-day' : ''}" class="table-fixed-header">
+        <th th:each="date, iterStat : ${weekDates}"
+            th:classappend="${#temporals.format(date.toInstant(), 'yyyy-MM-dd') >= #temporals.format(guest.booking.checkInAt.toInstant(), 'yyyy-MM-dd') && #temporals.format(date.toInstant(), 'yyyy-MM-dd') <= #temporals.format(guest.booking.checkOutAt.toInstant(), 'yyyy-MM-dd') ? 'guest-onsite' : ''}">
           <div>
             <div class="header-date" th:text="${#dates.format(date, 'dd MMM yyyy')}"></div>
             <div class="header-day" th:text="${#dates.format(date, 'EEEE')}"></div>
@@ -67,13 +71,12 @@
       <tbody>
       <tr th:each="guest : ${guests}">
         <td class="fixed-column" th:text="${guest.name}">Guest Name</td>
-        <td th:each="date, iterStat : ${weekDates}" th:classappend="${#dates.format(date, 'yyyy-MM-dd') == #dates.format(today, 'yyyy-MM-dd') ? 'current-day' : 'dark'}">
+        <td th:each="date, iterStat : ${weekDates}" th:classappend="${#temporals.format(date.toInstant(), 'yyyy-MM-dd') >= #temporals.format(guest.booking.checkInAt.toInstant(), 'yyyy-MM-dd') && #temporals.format(date.toInstant(), 'yyyy-MM-dd') <= #temporals.format(guest.booking.checkOutAt.toInstant(), 'yyyy-MM-dd') ? 'guest-on-site' : ''}">
           <form th:action="@{/participation/mark}" method="post">
             <input type="hidden" name="guestId" th:value="${guest.id}"/>
             <input type="hidden" name="courseId" value="1"/> <!-- Replace with actual course ID -->
             <input type="hidden" name="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}"/>
             <input type="checkbox" name="attended"
-                   th:classappend="${#dates.format(today, 'yyyy-MM-dd') == #dates.format(date, 'yyyy-MM-dd') ? 'current-day' : ''}"
                    th:checked="${#temporals.format(date.toInstant(), 'yyyy-MM-dd') >= #temporals.format(guest.booking.checkInAt.toInstant(), 'yyyy-MM-dd') && #temporals.format(date.toInstant(), 'yyyy-MM-dd') <= #temporals.format(guest.booking.checkOutAt.toInstant(), 'yyyy-MM-dd')}"
                    onclick="this.form.submit()"/>
           </form>
