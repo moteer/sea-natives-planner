@@ -17,9 +17,7 @@ public class Participation {
     @JoinColumn(name = "guest_id")
     private Guest guest;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    private String courseType;
 
     @Temporal(TemporalType.DATE)
     private Date date;

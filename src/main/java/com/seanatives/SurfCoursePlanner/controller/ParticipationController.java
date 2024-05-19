@@ -26,8 +26,8 @@ public class ParticipationController {
 
     @PostMapping("/mark")
     @ResponseBody
-    public ResponseEntity<Void> markAttendance(@RequestParam Long guestId, @RequestParam Long courseId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, @RequestParam boolean attended) {
-        participationService.markAttendance(guestId, courseId, date, attended);
+    public ResponseEntity<Void> markAttendance(@RequestParam Long guestId, @RequestParam String courseType, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, @RequestParam boolean attended) {
+        participationService.markAttendance(guestId, courseType, date, attended);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/weeklyAttendance")

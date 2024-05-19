@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParticipationRepository extends CrudRepository<Participation, Long> {
-    List<Participation> findByGuestAndCourseType(Guest guest, CourseType type);
+    List<Participation> findByGuestAndCourseType(Guest guest, String courseType);
 
-    Optional<Participation> findByGuestIdAndCourseIdAndDate(Long guestId, Long courseId, Date date);
+    Optional<Participation> findByGuestIdAndCourseTypeAndDate(Long guestId, String courseType, Date date);
 
     List<Participation> findByGuestId(Long guestId);
 }

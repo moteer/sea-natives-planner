@@ -5,7 +5,6 @@ import com.seanatives.SurfCoursePlanner.domain.Booking;
 import com.seanatives.SurfCoursePlanner.domain.Guest;
 import com.seanatives.SurfCoursePlanner.domain.Participation;
 import com.seanatives.SurfCoursePlanner.repository.BookingRepository;
-import com.seanatives.SurfCoursePlanner.repository.CourseRepository;
 import com.seanatives.SurfCoursePlanner.repository.GuestRepository;
 import com.seanatives.SurfCoursePlanner.repository.ParticipationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +26,12 @@ public class ParticipationService {
 
     @Autowired
     private BookingRepository bookingRepository;
-    private CourseRepository courseRepository;
 
-    public void markAttendance(Long guestId, Long courseId, Date date, boolean attended) {
-        Participation participation = participationRepository.findByGuestIdAndCourseIdAndDate(guestId, courseId, date)
+    public void markAttendance(Long guestId, String courseType, Date date, boolean attended) {
+        Participation participation = participationRepository.findByGuestIdAndCourseTypeAndDate(guestId, courseType, date)
                 .orElse(new Participation());
         participation.setGuest(guestRepository.findById(guestId).get());
-        participation.setCourse(courseRepository.findById(courseId).get());
+
         participation.setDate(date);
         participation.setAttended(attended);
         participationRepository.save(participation);

@@ -2,12 +2,14 @@ package com.seanatives.SurfCoursePlanner.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "guest")
+@ToString(exclude = "participations")
 public  class Guest {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -15,7 +17,7 @@ public  class Guest {
 
     private String name;
     private int numberOfSurfClassesBooked;
-    // Many-to-One Beziehung zu Booking
+    private int bookedSkateHours;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id")
