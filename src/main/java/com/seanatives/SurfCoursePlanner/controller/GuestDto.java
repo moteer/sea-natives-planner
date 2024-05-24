@@ -8,9 +8,10 @@ public class GuestDto {
     public GuestDto() {
     }
 
+    public Long id;
+
     public String name;
     public String age;
-    public Integer bookedYogaHours;
     public String bookingDetails;
     public Date checkInAt;
     public Date checkOutAt;
@@ -18,7 +19,9 @@ public class GuestDto {
     public String bookerFirstName;
     public String bookerLastName;
     public List<ParticipationDto> participations;
-    public Integer bookedSkateHours;
+    public Integer bookedYogaHours;
     public Integer bookedSurfHours;
-    public Long id;
+    public Integer bookedSkateHours;
+    public String tent;
+
 }

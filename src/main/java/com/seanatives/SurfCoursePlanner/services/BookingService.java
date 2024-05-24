@@ -88,12 +88,13 @@ public class BookingService {
             existingBooking.setCouples(booking.getCouples());
 
             // Gäste aktualisieren
+/*
             existingBooking.getGuests().clear();
             if (booking.getGuests() != null) {
                 booking.getGuests().forEach(guest -> guest.setBooking(existingBooking));
                 existingBooking.getGuests().addAll(booking.getGuests());
             }
-
+*/
             return bookingRepository.save(existingBooking);
         } else {
             // Neue Buchung

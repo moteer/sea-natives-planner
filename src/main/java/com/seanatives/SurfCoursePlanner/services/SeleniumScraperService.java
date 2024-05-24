@@ -6,6 +6,7 @@ package com.seanatives.SurfCoursePlanner.services;
 import com.seanatives.SurfCoursePlanner.domain.Booking;
 import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import com.seanatives.SurfCoursePlanner.domain.Guest;
+import com.seanatives.SurfCoursePlanner.repository.GuestRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -17,7 +18,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +57,8 @@ public class SeleniumScraperService {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private GuestParserService guestParserService;
+    @Autowired
+    private GuestRepository guestRepository;
 
     public List<CsvBooking> scrapeAllBookings() throws Exception {
         setUp();
@@ -84,40 +86,30 @@ public class SeleniumScraperService {
         String participants = waitForAndGetWebElement(By.id("OrderPaxLabel"), 10).getText();
         driver.findElements(By.cssSelector(".guestElement"))
                 .forEach(guestElement -> {
-                    Guest guest = new Guest();
-                    guest.setBooking(booking);
-                    guests.add(guest);
                     String guestName = guestElement.findElement(By.cssSelector(".guestElementName")).getText();
+
+                    Guest guest;
+                    Optional<Guest> guestOptional = guestRepository.findByNameAndBooking(guestName, booking);
+                    if (guestOptional.isEmpty()) {
+                        guest = new Guest();
+                        guest.setBooking(booking);
+                        guest.setName(guestName);
+                    } else {
+                        guest = guestOptional.get();
+                    }
+
+                    guests.add(guest);
+
+
                     String guestAge = findElementIfExists(guestElement, By.cssSelector(".ml-3.text-muted"));
-
-                    // Tent #10
-                    //String bookingLines = findElementIfExists(guestElement, By.cssSelector("[data-product-type='accommodation'] td:nth-child(3) > div > div:nth-child(3)"));
-
-                    guest.setName(guestName);
                     guest.setAge(guestAge);
-                    // Surf lesson adults
+
                     String bookingDetails = findElementIfExists(guestElement, By.cssSelector(".guestItineraryTable"));
                     guest.setBookingDetails(bookingDetails);
                     guestParserService.parseGuest(guest);
-
-                    guestElement.findElements(By.cssSelector("[data-product-id='c56a8cc5-1ec5-4011-a64f-e102234acf78']"))
-                            .forEach(td -> {
-                                String text = td.getText();
-                                guest.setNumberOfSurfClassesBooked(parseNumberOfSurfCourses(text));
-                            });
-
-                    // Surf course adults
-                    guestElement.findElements(By.cssSelector("[data-product-id='9beb5277-b0a6-4107-b56f-c33b74c43505']"))
-                            .forEach(td -> {
-                                guest.setNumberOfSurfClassesBooked(5);
-                            });
-                    // Surf course kids
-                    guestElement.findElements(By.cssSelector("[data-product-id='dffa5b6e-9e78-40c6-a8ca-300f6cc1e437']"))
-                            .forEach(td -> {
-                                guest.setNumberOfSurfClassesBooked(5);
-                            });
-
                     System.out.println(guest);
+
+                    guestRepository.save(guest);
 
                 });
         messagingTemplate.convertAndSend("/topic/logs",

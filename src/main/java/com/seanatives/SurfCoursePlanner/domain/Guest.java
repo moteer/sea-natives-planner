@@ -16,8 +16,13 @@ public  class Guest {
     private Long id;
 
     private String name;
-    private int numberOfSurfClassesBooked;
-    private int bookedSkateHours;
+
+    private Integer bookedYogaLessons = 0;
+    private boolean bookedYogaLessonsSuccessfullyScraped;
+    private Integer bookedSurfLessons = 0;
+    private boolean bookedSurfLessonsSuccessfullyScraped;
+    private Integer bookedSkateLessons = 0;
+    private boolean bookedSkateLessonsSuccessfullyScraped;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id")
@@ -26,9 +31,9 @@ public  class Guest {
     @Lob
     @Column(name = "booking_details", columnDefinition = "TEXT")
     private String bookingDetails;
-    private Integer bookedYogaHours;
 
     @OneToMany(mappedBy = "guest", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participation> participations;
 
+    public String tent;
 }

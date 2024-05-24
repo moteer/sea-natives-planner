@@ -38,7 +38,8 @@ public class DataLoaderService {
         List<Booking> bookings = persistBookings(csvBookings);
         messagingTemplate.convertAndSend("/topic/logs", format("%d bookings will be saved", bookings.size()));
         List<Guest> guests = scrapeGuestsFor(bookings, start, end);
-        persistGuests(guests);
+
+        //persistGuests(guests);
         guests.forEach(System.out::println);
     }
 

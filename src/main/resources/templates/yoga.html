@@ -101,7 +101,7 @@
             <td th:text="${guest.booking.bookingId}"></td>
             <td th:text="${#dates.format(guest.booking.checkInAt, 'yyyy-MM-dd')}"></td>
             <td th:text="${#dates.format(guest.booking.checkOutAt, 'yyyy-MM-dd')}"></td>
-            <td th:text="${guest.bookedYogaHours}"></td>
+            <td th:text="${guest.getBookedYogaLessons}"></td>
             <td th:text="${guest.bookingDetails}"></td>
         </tr>
         </tbody>

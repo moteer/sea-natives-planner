@@ -97,7 +97,7 @@
         <tr th:each="guest : ${guests}">
             <td th:text="${guest.id}"></td>
             <td th:text="${guest.name}"></td>
-            <td th:text="${guest.numberOfSurfClassesBooked}"></td>
+            <td th:text="${guest.getBookedSurfLessons}"></td>
             <td th:text="${guest.booking.bookingId}"></td>
             <td th:text="${#dates.format(guest.booking.checkInAt, 'yyyy-MM-dd')}"></td>
             <td th:text="${#dates.format(guest.booking.checkOutAt, 'yyyy-MM-dd')}"></td>

@@ -162,10 +162,11 @@ public class ParticipationRestController {
         guestDto.bookingId = guest.getBooking().getBookingId();
         guestDto.bookerFirstName = guest.getBooking().getBookerFirstName();
         guestDto.bookerLastName = guest.getBooking().getBookerLastName();
-        guestDto.bookedYogaHours = guest.getBookedYogaHours();
-        guestDto.bookedSkateHours = guest.getBookedSkateHours();
-        guestDto.bookedSurfHours = guest.getNumberOfSurfClassesBooked();
+        guestDto.bookedYogaHours = guest.getBookedYogaLessons();
+        guestDto.bookedSkateHours = guest.getBookedSkateLessons();
+        guestDto.bookedSurfHours = guest.getBookedSurfLessons();
         List<Participation> participations = guest.getParticipations();
+        guestDto.tent = guest.getTent();
         guestDto.participations = participations == null ? Collections.emptyList() : toParticipationsDto(participations);
         return guestDto;
     }

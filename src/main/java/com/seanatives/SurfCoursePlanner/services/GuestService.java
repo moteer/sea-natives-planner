@@ -63,7 +63,7 @@ public class GuestService {
             // Aktualisiere die notwendigen Felder des bestehenden Gastes
             if (guest.getAge()!= null) existingGuest.setAge(guest.getAge());
             if (guest.getBookingDetails()!= null) existingGuest.setBookingDetails(guest.getBookingDetails());
-            existingGuest.setNumberOfSurfClassesBooked(guest.getNumberOfSurfClassesBooked());
+            existingGuest.setBookedSurfLessons(guest.getBookedSurfLessons());
 
             // Weitere Felder hier aktualisieren
             return guestRepository.save(existingGuest);
