@@ -15,6 +15,8 @@ public  class Guest {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String dataId;
+
     private String name;
 
     private Integer bookedYogaLessons = 0;

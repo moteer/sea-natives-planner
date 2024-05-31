@@ -20,16 +20,28 @@ public class DataLoaderController {
     @Autowired
     private DataLoaderService dataLoaderService;
 
-    @PostMapping("/start")
-    public String startDataLoader(@RequestParam("startDate") String startDate,
-                                  @RequestParam("endDate") String endDate) throws Exception{
+    @PostMapping("/fullscrape")
+    public String fullScrapeOfBookings(@RequestParam("startDate") String startDate,
+                                       @RequestParam("endDate") String endDate) throws Exception {
 
         LocalDate startLocalDate = LocalDate.parse(startDate);
         LocalDate endLocalDate = LocalDate.parse(endDate);
         Date start = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date end = Date.from(endLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        //dataLoaderService.loadDataIncludingAllBookingsFromCSV(start, end);
+        dataLoaderService.loadDataIncludingAllBookingsFromCSV(start, end);
+        return "Data loader started";
+    }
+
+    @PostMapping("/update")
+    public String updateExistingBookings(@RequestParam("startDate") String startDate,
+                                           @RequestParam("endDate") String endDate) throws Exception {
+
+        LocalDate startLocalDate = LocalDate.parse(startDate);
+        LocalDate endLocalDate = LocalDate.parse(endDate);
+        Date start = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date end = Date.from(endLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
         dataLoaderService.rescrapeExistingBookings(start, end);
         return "Data loader started";
     }

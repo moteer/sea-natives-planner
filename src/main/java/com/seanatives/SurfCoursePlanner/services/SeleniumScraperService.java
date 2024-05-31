@@ -72,8 +72,7 @@ public class SeleniumScraperService {
         driver.close();
 
         messagingTemplate.convertAndSend("/topic/logs", format("scraping done"));
-        messagingTemplate.convertAndSend("/topic/logs", format("scraped %d guests", guests.size()));
-        System.out.println(format("scraped %d guests", guests.size()));
+        log(format("scraped %d guests", guests.size()));
         return guests;
     }
 
@@ -88,22 +87,14 @@ public class SeleniumScraperService {
         driver.findElements(By.cssSelector(".guestElement"))
                 .forEach(guestElement -> {
 
+                    // Todo: check if the guest has been canceled
                     String guestName = waitForAndGetWebElement(guestElement, By.cssSelector(".guestElementName"), 10).getText();;
-                    messagingTemplate.convertAndSend("/topic/logs",
-                            format("Scrape %s ", guestName));
-                    System.out.println(format("Scrape %s ", guestName));
-                    Guest guest;
-                    Optional<Guest> guestOptional = guestRepository.findByNameAndBooking(guestName, booking);
-                    if (guestOptional.isEmpty()) {
-                        guest = new Guest();
-                        guest.setBooking(booking);
-                        guest.setName(guestName);
-                    } else {
-                        guest = guestOptional.get();
-                    }
+                    String dataId = guestElement.getAttribute("data-id");
 
+                    log(format("Scrape %s with data-id: %s", guestName, dataId));
+
+                    Guest guest = findOrCreateGuest(booking, guestName, dataId);
                     guests.add(guest);
-
 
                     String guestAge = findElementIfExists(guestElement, By.cssSelector(".ml-3.text-muted"));
                     guest.setAge(guestAge);
@@ -115,28 +106,9 @@ public class SeleniumScraperService {
                             By.cssSelector(".client"), 10);
                     waitForElementToBeClickableAndClick(guestNameButton, 10);
 
-                    WebElement guestModalWindow = waitForAndGetWebElement(By.cssSelector(".modal-dialog"), 10);
-
-                    //Parse SurfLevel
-                    WebElement levelSelect = guestModalWindow.findElement(By.name("level_id"));
-                    Select select = new Select(levelSelect);
-                    WebElement selectedOption = select.getFirstSelectedOption();
-                    String level = selectedOption.getText();
-
-                    WebElement closeButton = guestModalWindow.findElement(By.cssSelector(".close"));
-                    waitForElementToBeClickableAndClick(closeButton, 10);
-
-                    try {
-                        waitForWebElementToDisappear(guestModalWindow, 1);
-                    } catch (Exception e) {
-                        System.out.println("try to close modal again");
-                        waitForElementToBeClickableAndClick(closeButton, 10);
-                        waitForWebElementToDisappear(guestModalWindow, 10);
-                    }
-
-                    messagingTemplate.convertAndSend("/topic/logs", "Level: " + level);
-                    System.out.println("Level: " + level);
+                    String level = scrapeSurfLevelFromModal();
                     guest.setSurfLevel(level);
+                    log("Level: " + level);
 
                     guestParserService.parseGuest(guest);
                     System.out.println(guest);
@@ -148,6 +120,48 @@ public class SeleniumScraperService {
         messagingTemplate.convertAndSend("/topic/logs",
                 format("Found %d guests for that booking", guests.size()));
         return guests;
+    }
+
+    private void log(String message) {
+        messagingTemplate.convertAndSend("/topic/logs", message);
+        System.out.println(message);
+    }
+
+    private Guest findOrCreateGuest(Booking booking, String guestName, String dataId) {
+        Guest guest;
+
+        Optional<Guest> guestOptional = guestRepository.findByDataId(dataId);
+        if (guestOptional.isEmpty()) {
+            guest = new Guest();
+            guest.setBooking(booking);
+            guest.setName(guestName);
+            guest.setDataId(dataId);
+        } else {
+            guest = guestOptional.get();
+        }
+        return guest;
+    }
+
+    private String scrapeSurfLevelFromModal() {
+        WebElement guestModalWindow = waitForAndGetWebElement(By.cssSelector(".modal-dialog"), 10);
+
+        //Parse SurfLevel
+        WebElement levelSelect = guestModalWindow.findElement(By.name("level_id"));
+        Select select = new Select(levelSelect);
+        WebElement selectedOption = select.getFirstSelectedOption();
+        String level = selectedOption.getText();
+
+        WebElement closeButton = guestModalWindow.findElement(By.cssSelector(".close"));
+        waitForElementToBeClickableAndClick(closeButton, 10);
+
+        try {
+            waitForWebElementToDisappear(guestModalWindow, 1);
+        } catch (Exception e) {
+            System.out.println("try to close modal again");
+            waitForElementToBeClickableAndClick(closeButton, 10);
+            waitForWebElementToDisappear(guestModalWindow, 10);
+        }
+        return level;
     }
 
     private String findElementIfExists(WebElement webElement, By locator) {

@@ -4,7 +4,11 @@ import com.seanatives.SurfCoursePlanner.domain.Booking;
 import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,8 +32,8 @@ public class BookingCopyService {
         booking.setChannel(csvBooking.getChannel());
         booking.setBooking(csvBooking.getBooking());
         booking.setStatus(csvBooking.getStatus());
-        booking.setCheckInAt(csvBooking.getCheckInAt());
-        booking.setCheckOutAt(csvBooking.getCheckOutAt());
+        booking.setCheckInAt(removeTime(csvBooking.getCheckInAt()));
+        booking.setCheckOutAt(removeTime(csvBooking.getCheckOutAt()));
         booking.setNights(csvBooking.getNights());
         booking.setComments(csvBooking.getComments());
         booking.setLocation(csvBooking.getLocation());
@@ -55,9 +59,14 @@ public class BookingCopyService {
         booking.setPax(csvBooking.getPax());
         booking.setCouples(csvBooking.getCouples());
 
-        // Hier muss ggf. die Logik zum Kopieren der Gästeliste implementiert werden
-        // Dies hängt von der Struktur und den Beziehungen der Guest-Entität ab
-
         return booking;
+    }
+
+    private static Date removeTime(Date date) {
+        if (date == null) {
+            return null;
+        }
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 }

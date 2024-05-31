@@ -30,25 +30,38 @@ public class DataLoaderService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * Downloads the CSV of bookings from bookinglayer.
+     * This way all new bookings will be scraped.
+     *
+     * Alle guest information of those bookings within the given period will be scraped.
+     *
+     * @param start
+     * @param end
+     * @throws Exception
+     */
     public void loadDataIncludingAllBookingsFromCSV(Date start, Date end) throws Exception {
         messagingTemplate.convertAndSend("/topic/logs", "Scrape all bookings");
         List<CsvBooking> csvBookings = seleniumScraperService.scrapeAllBookings();
         List<Booking> bookings = persistBookings(csvBookings);
         messagingTemplate.convertAndSend("/topic/logs", format("%d bookings will be saved", bookings.size()));
         List<Guest> guests = scrapeGuestsFor(bookings, start, end);
-
-        //persistGuests(guests);
         guests.forEach(System.out::println);
     }
 
+    /**
+     * Only updates the existing guests for bookings that are already persisted before
+     * that have checkin dates within the given range.
+     *
+     * @param start
+     * @param end
+     * @throws Exception
+     */
     public void rescrapeExistingBookings(Date start, Date end) throws Exception {
-        messagingTemplate.convertAndSend("/topic/logs", "Rescrape Bookings");
-
+        messagingTemplate.convertAndSend("/topic/logs", "Update Bookings and scrape guest details again");
         List<Booking> bookings = bookingService.findBookingsInRange2(getStartOfDay(start), getEndOfDay(end));
         messagingTemplate.convertAndSend("/topic/logs", format("%d bookings will be saved", bookings.size()));
-        List<Guest> guests = scrapeGuestsFor(bookings, start, end);
-
-        //persistGuests(guests);
+        List<Guest> guests = seleniumScraperService.scrapeGuestsFor(bookings);
         guests.forEach(System.out::println);
     }
 

@@ -76,10 +76,19 @@
             });
         }
 
-        function startDataLoader() {
+        function fullScrapeOfBookings() {
             var startDate = $('#startDate').val();
             var endDate = $('#endDate').val();
-            fetch('/api/dataloader/start?startDate=' + startDate + '&endDate=' + endDate, { method: 'POST' })
+            fetch('/api/dataloader/fullscrape?startDate=' + startDate + '&endDate=' + endDate, { method: 'POST' })
+                .then(response => response.text())
+                .then(message => console.log(message))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateExistingBookings() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            fetch('/api/dataloader/update?startDate=' + startDate + '&endDate=' + endDate, { method: 'POST' })
                 .then(response => response.text())
                 .then(message => console.log(message))
                 .catch(error => console.error('Error:', error));
@@ -106,17 +115,21 @@
 <div class="container">
     <h1>Data Loader Console</h1>
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-3">
             <label for="startDate">Start Date:</label>
             <input type="text" id="startDate" class="form-control" placeholder="YYYY-MM-DD">
         </div>
-        <div class="col-md-5">
+        <div class="col-md-3">
             <label for="endDate">End Date:</label>
             <input type="text" id="endDate" class="form-control" placeholder="YYYY-MM-DD">
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label>&nbsp;</label>
-            <button id="startButton" class="btn btn-primary btn-block" onclick="startDataLoader()">Start</button>
+            <button id="startButton" class="btn btn-primary btn-block" onclick="fullScrapeOfBookings()">Full update (CSV)</button>
+        </div>
+        <div class="col-md-3">
+            <label>&nbsp;</label>
+            <button id="updateButton" class="btn btn-primary btn-block" onclick="updateExistingBookings()">Update existing bookings</button>
         </div>
     </div>
     <br>
