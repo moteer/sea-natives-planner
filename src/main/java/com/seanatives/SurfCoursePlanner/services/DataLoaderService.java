@@ -8,9 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -32,7 +30,7 @@ public class DataLoaderService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    public void loadData(Date start, Date end) throws Exception {
+    public void loadDataIncludingAllBookingsFromCSV(Date start, Date end) throws Exception {
         messagingTemplate.convertAndSend("/topic/logs", "Scrape all bookings");
         List<CsvBooking> csvBookings = seleniumScraperService.scrapeAllBookings();
         List<Booking> bookings = persistBookings(csvBookings);
@@ -41,6 +39,31 @@ public class DataLoaderService {
 
         //persistGuests(guests);
         guests.forEach(System.out::println);
+    }
+
+    public void rescrapeExistingBookings(Date start, Date end) throws Exception {
+        messagingTemplate.convertAndSend("/topic/logs", "Rescrape Bookings");
+
+        List<Booking> bookings = bookingService.findBookingsInRange2(getStartOfDay(start), getEndOfDay(end));
+        messagingTemplate.convertAndSend("/topic/logs", format("%d bookings will be saved", bookings.size()));
+        List<Guest> guests = scrapeGuestsFor(bookings, start, end);
+
+        //persistGuests(guests);
+        guests.forEach(System.out::println);
+    }
+
+    public static Date getStartOfDay(Date date) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDateTime startOfDay = localDate.atStartOfDay();
+        ZonedDateTime zonedDateTime = startOfDay.atZone(ZoneId.systemDefault());
+        return Date.from(zonedDateTime.toInstant());
+    }
+
+    public static Date getEndOfDay(Date date) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDateTime endOfDay = localDate.atTime(23, 59, 59, 999999999);
+        ZonedDateTime zonedDateTime = endOfDay.atZone(ZoneId.systemDefault());
+        return Date.from(zonedDateTime.toInstant());
     }
 
     private void persistGuests(List<Guest> guests) {

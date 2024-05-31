@@ -36,4 +36,7 @@ public  class Guest {
     private List<Participation> participations;
 
     public String tent;
+
+    public String surfLevel;
+
 }

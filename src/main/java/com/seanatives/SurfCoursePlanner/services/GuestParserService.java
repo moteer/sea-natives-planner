@@ -83,7 +83,7 @@ Skate lessons
             return Integer.parseInt(matcher.group(1));
         }
 
-        return null;
+        return 0;
     }
 
     /*
@@ -130,7 +130,7 @@ Skate lessons
             return 1;
         }
 
-        return null;
+        return 0;
     }
 
     /*
@@ -161,6 +161,6 @@ Skate lessons
             return 5;
         }
 
-        return null;
+        return 0;
     }
 }

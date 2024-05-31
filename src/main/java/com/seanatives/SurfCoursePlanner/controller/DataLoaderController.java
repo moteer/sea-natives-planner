@@ -2,7 +2,6 @@ package com.seanatives.SurfCoursePlanner.controller;
 
 import com.seanatives.SurfCoursePlanner.services.DataLoaderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,8 @@ public class DataLoaderController {
         Date start = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date end = Date.from(endLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        dataLoaderService.loadData(start, end);
+        //dataLoaderService.loadDataIncludingAllBookingsFromCSV(start, end);
+        dataLoaderService.rescrapeExistingBookings(start, end);
         return "Data loader started";
     }
 }

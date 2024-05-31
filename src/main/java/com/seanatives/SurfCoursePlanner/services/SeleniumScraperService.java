@@ -7,14 +7,12 @@ import com.seanatives.SurfCoursePlanner.domain.Booking;
 import com.seanatives.SurfCoursePlanner.domain.CsvBooking;
 import com.seanatives.SurfCoursePlanner.domain.Guest;
 import com.seanatives.SurfCoursePlanner.repository.GuestRepository;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,7 +70,10 @@ public class SeleniumScraperService {
         List<Guest> guests = new ArrayList<>();
         bookings.forEach(booking -> guests.addAll(scrapeParticipantsForBooking(booking)));
         driver.close();
+
         messagingTemplate.convertAndSend("/topic/logs", format("scraping done"));
+        messagingTemplate.convertAndSend("/topic/logs", format("scraped %d guests", guests.size()));
+        System.out.println(format("scraped %d guests", guests.size()));
         return guests;
     }
 
@@ -83,11 +84,14 @@ public class SeleniumScraperService {
         System.out.println(format("scrape booking: %s for booker %s", booking.getBookingId(), booking.getBookerFirstName()));
         driver.get(format("https://app.bookinglayer.io/orders/%s", booking.getBookingId()));
         loginIfNeeded();
-        String participants = waitForAndGetWebElement(By.id("OrderPaxLabel"), 10).getText();
+        waitForAndGetWebElement(By.id("OrderPaxLabel"), 10).getText();
         driver.findElements(By.cssSelector(".guestElement"))
                 .forEach(guestElement -> {
-                    String guestName = guestElement.findElement(By.cssSelector(".guestElementName")).getText();
 
+                    String guestName = waitForAndGetWebElement(guestElement, By.cssSelector(".guestElementName"), 10).getText();;
+                    messagingTemplate.convertAndSend("/topic/logs",
+                            format("Scrape %s ", guestName));
+                    System.out.println(format("Scrape %s ", guestName));
                     Guest guest;
                     Optional<Guest> guestOptional = guestRepository.findByNameAndBooking(guestName, booking);
                     if (guestOptional.isEmpty()) {
@@ -106,10 +110,39 @@ public class SeleniumScraperService {
 
                     String bookingDetails = findElementIfExists(guestElement, By.cssSelector(".guestItineraryTable"));
                     guest.setBookingDetails(bookingDetails);
+
+                    WebElement guestNameButton = waitForAndGetWebElement(guestElement,
+                            By.cssSelector(".client"), 10);
+                    waitForElementToBeClickableAndClick(guestNameButton, 10);
+
+                    WebElement guestModalWindow = waitForAndGetWebElement(By.cssSelector(".modal-dialog"), 10);
+
+                    //Parse SurfLevel
+                    WebElement levelSelect = guestModalWindow.findElement(By.name("level_id"));
+                    Select select = new Select(levelSelect);
+                    WebElement selectedOption = select.getFirstSelectedOption();
+                    String level = selectedOption.getText();
+
+                    WebElement closeButton = guestModalWindow.findElement(By.cssSelector(".close"));
+                    waitForElementToBeClickableAndClick(closeButton, 10);
+
+                    try {
+                        waitForWebElementToDisappear(guestModalWindow, 1);
+                    } catch (Exception e) {
+                        System.out.println("try to close modal again");
+                        waitForElementToBeClickableAndClick(closeButton, 10);
+                        waitForWebElementToDisappear(guestModalWindow, 10);
+                    }
+
+                    messagingTemplate.convertAndSend("/topic/logs", "Level: " + level);
+                    System.out.println("Level: " + level);
+                    guest.setSurfLevel(level);
+
                     guestParserService.parseGuest(guest);
                     System.out.println(guest);
 
                     guestRepository.save(guest);
+
 
                 });
         messagingTemplate.convertAndSend("/topic/logs",
@@ -242,6 +275,25 @@ public class SeleniumScraperService {
         System.out.printf("webDriver wait until %s appears...%n", locator.toString());
         WebElement webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
         return webElement;
+    }
+    private void waitForWebElementToDisappear(WebElement webElement, int seconds) {
+        WebDriverWait webDriverWait = new WebDriverWait(driver, ofSeconds(seconds));
+        System.out.printf("webDriver wait until %s dissappears...%n", webElement.getTagName());
+        webDriverWait.until(ExpectedConditions.invisibilityOf(webElement));
+    }
+
+    private WebElement waitForAndGetWebElement(WebElement parentElement, By locator, int seconds) {
+        WebDriverWait webDriverWait = new WebDriverWait(driver, ofSeconds(seconds));
+        System.out.printf("webDriver wait until %s appears...%n", locator.toString());
+        WebElement childElement = webDriverWait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(parentElement, locator));
+        return childElement;
+    }
+
+    private void waitForElementToBeClickableAndClick(WebElement webElement, int seconds) {
+        WebDriverWait webDriverWait = new WebDriverWait(driver, ofSeconds(seconds));
+        System.out.printf("webDriver waits until %s clickable...%n", webElement.getTagName());
+        webDriverWait.until(ExpectedConditions.elementToBeClickable(webElement));
+        webElement.click();
     }
 
     private void login() {

@@ -28,6 +28,11 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    public List<Booking> findBookingsInRange2(Date startDate, Date endDate) {
+        return bookingRepository.findAllGuestsBetweenDates(startDate, endDate);
+    }
+
+
     public List<Booking> findBookingsInRange(LocalDate startDate, LocalDate endDate) {
         return findAll().stream()
                 .filter(booking -> {
